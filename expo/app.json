@@ -15,14 +15,14 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "app.rork.field-report-system-app"
+      "bundleIdentifier": "app.rork.sakran-kids-ai"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "app.rork.field_report_system_app"
+      "package": "app.rork.sakran_kids_ai"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -34,8 +34,7 @@
           "origin": "https://rork.com/"
         }
       ],
-      "expo-font",
-      "expo-web-browser"
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
