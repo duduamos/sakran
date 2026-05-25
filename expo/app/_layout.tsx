@@ -17,11 +17,11 @@ function NavGate({ children }: { children: React.ReactNode }) {
     if (authLoading || kidLoading) return;
 
     const firstSegment = segments[0] as string;
-    const inLogin = firstSegment === 'login';
+    const inAuthFlow = firstSegment === 'login' || firstSegment === 'signup';
     const inOnboarding = firstSegment === 'onboarding';
 
     if (!user) {
-      if (!inLogin) router.replace('/login' as any);
+      if (!inAuthFlow) router.replace('/login' as any);
       return;
     }
 
@@ -30,7 +30,7 @@ function NavGate({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    if (inLogin || inOnboarding) {
+    if (inAuthFlow || inOnboarding) {
       router.replace('/(tabs)' as any);
     }
   }, [user, activeKid, authLoading, kidLoading, segments]);
@@ -44,6 +44,7 @@ function RootLayoutNav() {
       <Stack screenOptions={{ headerBackTitle: "חזור" }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false, gestureEnabled: false }} />
+        <Stack.Screen name="signup" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" options={{ headerShown: false, gestureEnabled: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>

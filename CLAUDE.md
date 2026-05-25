@@ -15,7 +15,7 @@ repo. All field-report code, types, and routes are gone.
 | Sprint | Content | Status |
 |---|---|---|
 | **0** | Repo cleanup, screen scaffolding with mock data | ✅ Done |
-| **1** | Parent registration, child profile DB | TODO |
+| **1** | Parent registration (Supabase Auth) + child profile DB (Supabase Postgres) | ✅ Done |
 | **2** | Claude API integration for age-tuned answers | TODO |
 | **3** | Moderation layer + safety filters | TODO |
 | **4** | Curated image cache (500 topics) | TODO |
@@ -26,7 +26,8 @@ repo. All field-report code, types, and routes are gone.
 
 - **App**: React Native + Expo Router 6 (file-based routing)
 - **Backend**: Hono + tRPC (currently just a `/health` route)
-- **State**: AsyncStorage + custom context hooks (`@nkzw/create-context-hook`)
+- **Auth + DB**: Supabase (Postgres + Auth, RLS-protected)
+- **Local state**: AsyncStorage + custom context hooks (`@nkzw/create-context-hook`)
 - **Runtime**: Bun
 - **UI lang**: Hebrew, RTL-first
 
@@ -35,8 +36,9 @@ repo. All field-report code, types, and routes are gone.
 ```
 expo/
   app/
-    _layout.tsx        — root nav gate (login → onboarding → tabs)
-    login.tsx          — parent login
+    _layout.tsx        — root nav gate (auth → onboarding → tabs)
+    login.tsx          — parent sign-in (email + password)
+    signup.tsx         — parent sign-up + age/terms attestation
     onboarding.tsx     — parent creates child profile (name, age, interests)
     (tabs)/
       index.tsx        — child: "ask anything" screen
@@ -47,27 +49,39 @@ expo/
   constants/
     colors.ts          — kid-friendly purple+pink+amber palette
     mockAnswers.ts     — Sprint-0 mock Q&A by age (5-10)
-    users.ts           — default parent demo account
   contexts/
-    AuthContext.tsx    — parent session
-    KidContext.tsx     — active child profile + question history
+    AuthContext.tsx    — Supabase parent session (signUp/signIn/signOut)
+    KidContext.tsx     — kids list (Supabase) + history (AsyncStorage per parent)
+  lib/
+    supabase.ts        — Supabase client (AsyncStorage adapter, env-driven)
   types/
     kid.ts             — KidProfile, QuestionRecord, ParentUser, INTERESTS
   backend/
     hono.ts            — Hono app
     trpc/              — tRPC router (currently `health` only)
+supabase/
+  migrations/
+    0001_init.sql      — parent_profiles, kids, RLS, signup trigger
 ```
 
 ## Running
 
 ```bash
 cd expo
+cp .env.example .env       # then fill in Supabase URL + anon key
 bun install
 bun run start      # Expo CLI, tunneled — scan QR
 bun run start-web  # web preview
 ```
 
-Default demo parent login: `demo` / `1234`.
+### Supabase setup (one-time)
+
+1. Create a project at https://supabase.com (Frankfurt or London region).
+2. **Authentication → Providers**: keep Email enabled with "Confirm email" on.
+3. Open the SQL Editor and run `supabase/migrations/0001_init.sql`.
+4. Copy **Project URL** + **anon public key** into `expo/.env`.
+
+No demo account — sign up as a real parent via the in-app signup screen.
 
 ## Conventions
 
@@ -75,8 +89,9 @@ Default demo parent login: `demo` / `1234`.
 - **No real LLM yet**: `KidContext.askQuestion` calls `makeMockRecord` which
   pattern-matches keywords against curated mock answers. Replace this in
   Sprint 2 with a tRPC call to Claude.
-- **No remote DB yet**: all state is in AsyncStorage. The Turso credentials
-  from the old field-report app were removed.
+- **Remote DB**: parent + kids live in Supabase Postgres, behind RLS so
+  each parent only ever sees their own rows. Question history is still
+  AsyncStorage-only (per parent id), pending Sprint 2.
 - **Privacy by default**: nothing leaves the device. Future LLM calls must
   send minimal context (no name, no age beyond bucket, etc.).
 
@@ -92,4 +107,4 @@ Default demo parent login: `demo` / `1234`.
 
 ## Branch
 
-Development branch: `claude/ai-kids-assistant-qPQSs`
+Development branch: `claude/loving-faraday-mVxie`

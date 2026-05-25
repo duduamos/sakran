@@ -22,7 +22,7 @@ const AGES: KidAge[] = [5, 6, 7, 8, 9, 10];
 export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
   const { createKid } = useKid();
-  const { logout, user } = useAuth();
+  const { signOut, user } = useAuth();
   const [name, setName] = useState<string>('');
   const [age, setAge] = useState<KidAge | null>(null);
   const [interests, setInterests] = useState<InterestTag[]>([]);
@@ -69,7 +69,7 @@ export default function OnboardingScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.headerRow}>
-          <TouchableOpacity onPress={logout} hitSlop={10} testID="onboarding-logout">
+          <TouchableOpacity onPress={signOut} hitSlop={10} testID="onboarding-logout">
             <Text style={styles.logoutText}>יציאה</Text>
           </TouchableOpacity>
           <View style={styles.headerCenter}>

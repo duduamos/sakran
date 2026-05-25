@@ -12,15 +12,17 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Sparkles, User, Lock, ChevronLeft } from 'lucide-react-native';
+import { Sparkles, Mail, Lock, ChevronLeft } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import Colors from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
-  const { login } = useAuth();
-  const [username, setUsername] = useState<string>('');
+  const router = useRouter();
+  const { signIn } = useAuth();
+  const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -45,15 +47,15 @@ export default function LoginScreen() {
   };
 
   const handleLogin = async () => {
-    if (!username.trim() || !password.trim()) {
-      Alert.alert('שגיאה', 'נא למלא שם משתמש וסיסמה');
+    if (!email.trim() || !password.trim()) {
+      Alert.alert('שגיאה', 'נא למלא אימייל וסיסמה');
       shake();
       return;
     }
 
     setIsLoading(true);
     try {
-      const result = await login(username.trim(), password.trim());
+      const result = await signIn(email.trim(), password);
       if (!result.success) {
         Alert.alert('שגיאה', result.message);
         shake();
@@ -89,17 +91,18 @@ export default function LoginScreen() {
 
           <Animated.View style={[styles.formCard, { transform: [{ translateX: shakeAnim }] }]}>
             <View style={styles.inputWrapper}>
-              <User size={20} color={Colors.textSecondary} />
+              <Mail size={20} color={Colors.textSecondary} />
               <TextInput
                 style={styles.input}
-                placeholder="שם משתמש"
+                placeholder="אימייל"
                 placeholderTextColor={Colors.textLight}
-                value={username}
-                onChangeText={setUsername}
+                value={email}
+                onChangeText={setEmail}
                 autoCapitalize="none"
                 autoCorrect={false}
+                keyboardType="email-address"
                 textAlign="right"
-                testID="login-username"
+                testID="login-email"
               />
             </View>
 
@@ -137,7 +140,15 @@ export default function LoginScreen() {
             )}
           </TouchableOpacity>
 
-          <Text style={styles.hint}>חשבון דמו: demo / 1234</Text>
+          <TouchableOpacity
+            onPress={() => router.push('/signup' as any)}
+            style={styles.signupLink}
+            testID="login-go-signup"
+          >
+            <Text style={styles.signupLinkText}>
+              אין לך חשבון? <Text style={styles.signupLinkBold}>הירשם כהורה</Text>
+            </Text>
+          </TouchableOpacity>
         </Animated.View>
       </KeyboardAvoidingView>
     </LinearGradient>
@@ -203,5 +214,7 @@ const styles = StyleSheet.create({
   },
   loginButtonDisabled: { opacity: 0.7 },
   loginButtonText: { color: Colors.white, fontSize: 18, fontWeight: '700' as const },
-  hint: { marginTop: 18, color: 'rgba(255,255,255,0.75)', fontSize: 13 },
+  signupLink: { marginTop: 22 },
+  signupLinkText: { color: 'rgba(255,255,255,0.85)', fontSize: 14 },
+  signupLinkBold: { color: Colors.white, fontWeight: '800' as const },
 });

@@ -22,9 +22,10 @@ export interface KidProfile {
 }
 
 export interface ParentUser {
-  username: string;
+  id: string;
+  email: string;
   name: string;
-  email?: string;
+  emailVerified: boolean;
 }
 
 export interface QuestionImage {

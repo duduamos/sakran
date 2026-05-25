@@ -22,8 +22,8 @@ import { INTERESTS } from '@/types/kid';
 
 export default function ParentScreen() {
   const insets = useSafeAreaInsets();
-  const { user, logout } = useAuth();
-  const { activeKid, history, clearKid } = useKid();
+  const { user, signOut } = useAuth();
+  const { activeKid, history, deleteActiveKid } = useKid();
 
   const stats = useMemo(() => {
     if (!history.length) return null;
@@ -51,7 +51,7 @@ export default function ParentScreen() {
       'פעולה זו תמחק את הפרופיל וההיסטוריה. להמשיך?',
       [
         { text: 'ביטול', style: 'cancel' },
-        { text: 'מחק', style: 'destructive', onPress: () => clearKid() },
+        { text: 'מחק', style: 'destructive', onPress: () => deleteActiveKid() },
       ]
     );
   };
@@ -66,7 +66,7 @@ export default function ParentScreen() {
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 14 }]}>
         <View style={styles.headerRow}>
-          <TouchableOpacity onPress={logout} hitSlop={10} testID="parent-logout">
+          <TouchableOpacity onPress={signOut} hitSlop={10} testID="parent-logout">
             <LogOut size={20} color={Colors.error} />
           </TouchableOpacity>
           <Text style={styles.title}>פאנל הורה</Text>
