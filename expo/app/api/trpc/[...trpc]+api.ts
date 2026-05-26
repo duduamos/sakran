@@ -1,6 +1,7 @@
 import app from '@/backend/hono';
 
-const handler = (request: Request): Promise<Response> => app.fetch(request);
+const handler = (request: Request): Response | Promise<Response> =>
+  app.fetch(request);
 
 export const GET = handler;
 export const POST = handler;

@@ -15,7 +15,6 @@ function getBaseUrl(): string {
   // Native (dev): derive host from the Expo dev server
   const hostUri =
     Constants.expoConfig?.hostUri ??
-    // @ts-expect-error - older Expo SDKs put it here
     Constants.manifest?.debuggerHost ??
     "";
   const host = hostUri.split(":")[0];
