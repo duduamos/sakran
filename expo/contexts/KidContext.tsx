@@ -5,6 +5,7 @@ import { KidProfile, QuestionRecord, KidAge, InterestTag } from '@/types/kid';
 import { makeMockRecord } from '@/constants/mockAnswers';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { getClient, isBackendConfigured } from '@/lib/api';
 
 const AVATAR_OPTIONS = ['🦊', '🐼', '🐯', '🦄', '🐸', '🐙', '🦁', '🐨'];
 
@@ -206,12 +207,48 @@ export const [KidProvider, useKid] = createContextHook(() => {
       if (!activeKid || !parentId) {
         throw new Error('No active kid profile');
       }
-      const base = makeMockRecord(activeKid.id, question, activeKid.age);
-      const record: QuestionRecord = {
-        ...base,
-        id: `q_${Date.now()}`,
-        createdAt: new Date().toISOString(),
-      };
+
+      let record: QuestionRecord;
+
+      if (isBackendConfigured()) {
+        try {
+          const client = getClient();
+          const result = await client.ask.mutate({
+            question,
+            age: activeKid.age,
+            interests: activeKid.interests,
+          });
+          record = {
+            id: `q_${Date.now()}`,
+            kidId: activeKid.id,
+            question,
+            answer: result.answer,
+            followUp: result.followUp,
+            parentPrompt: result.parentPrompt,
+            topic: result.topic,
+            images: [
+              { emoji: '✨', caption: result.topic, bg: '#fef3c7', source: 'mock' },
+            ],
+            createdAt: new Date().toISOString(),
+          };
+        } catch (error) {
+          console.error('[Kid] backend ask failed, falling back to mock:', error);
+          const base = makeMockRecord(activeKid.id, question, activeKid.age);
+          record = {
+            ...base,
+            id: `q_${Date.now()}`,
+            createdAt: new Date().toISOString(),
+          };
+        }
+      } else {
+        const base = makeMockRecord(activeKid.id, question, activeKid.age);
+        record = {
+          ...base,
+          id: `q_${Date.now()}`,
+          createdAt: new Date().toISOString(),
+        };
+      }
+
       const next = [record, ...history].slice(0, 200);
       setHistory(next);
       await AsyncStorage.setItem(historyKey(parentId), JSON.stringify(next));

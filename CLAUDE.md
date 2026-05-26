@@ -16,7 +16,7 @@ repo. All field-report code, types, and routes are gone.
 |---|---|---|
 | **0** | Repo cleanup, screen scaffolding with mock data | ✅ Done |
 | **1** | Parent registration (Supabase Auth) + child profile DB (Supabase Postgres) | ✅ Done |
-| **2** | Claude API integration for age-tuned answers | TODO |
+| **2** | Claude API integration for age-tuned answers | ✅ Done |
 | **3** | Moderation layer + safety filters | TODO |
 | **4** | Curated image cache (500 topics) | TODO |
 | **5** | Full parent dashboard | TODO |
@@ -58,7 +58,10 @@ expo/
     kid.ts             — KidProfile, QuestionRecord, ParentUser, INTERESTS
   backend/
     hono.ts            — Hono app
-    trpc/              — tRPC router (currently `health` only)
+    trpc/
+      app-router.ts    — tRPC router (health + ask)
+      routes/
+        answer.ts      — Claude Haiku 4.5 call with age-tuned Hebrew prompt
 supabase/
   migrations/
     0001_init.sql      — parent_profiles, kids, RLS, signup trigger
@@ -86,9 +89,10 @@ No demo account — sign up as a real parent via the in-app signup screen.
 ## Conventions
 
 - **Hebrew-first**: all user-facing text in Hebrew; `flexDirection: 'row-reverse'` for RTL rows
-- **No real LLM yet**: `KidContext.askQuestion` calls `makeMockRecord` which
-  pattern-matches keywords against curated mock answers. Replace this in
-  Sprint 2 with a tRPC call to Claude.
+- **LLM**: `KidContext.askQuestion` calls the backend `ask` tRPC route, which
+  hits Claude Haiku 4.5 with an age-tuned Hebrew system prompt and a forced
+  `provide_answer` tool for structured output. Falls back to `makeMockRecord`
+  if `ANTHROPIC_API_KEY` is missing or the call fails.
 - **Remote DB**: parent + kids live in Supabase Postgres, behind RLS so
   each parent only ever sees their own rows. Question history is still
   AsyncStorage-only (per parent id), pending Sprint 2.
