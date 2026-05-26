@@ -25,7 +25,9 @@ repo. All field-report code, types, and routes are gone.
 ## Stack
 
 - **App**: React Native + Expo Router 6 (file-based routing)
-- **Backend**: Hono + tRPC (currently just a `/health` route)
+- **Backend**: Hono + tRPC mounted at `/api/trpc/*`, served by an Expo
+  Router API route (`app/api/trpc/[...trpc]+api.ts`) — runs in the same
+  Expo dev server, no second process.
 - **Auth + DB**: Supabase (Postgres + Auth, RLS-protected)
 - **Local state**: AsyncStorage + custom context hooks (`@nkzw/create-context-hook`)
 - **Runtime**: Bun
@@ -44,6 +46,10 @@ expo/
       index.tsx        — child: "ask anything" screen
       library.tsx      — past Q&A
       parent.tsx       — parent dashboard (stats, conversation prompts)
+    api/
+      trpc/
+        [...trpc]+api.ts — Expo Router API route that hands every
+                           request under /api/trpc/* to the Hono app
   components/
     AnswerCard.tsx     — Q/A card with image carousel + follow-up
   constants/
@@ -57,7 +63,8 @@ expo/
   types/
     kid.ts             — KidProfile, QuestionRecord, ParentUser, INTERESTS
   backend/
-    hono.ts            — Hono app
+    hono.ts            — Hono app, mounted by the API route above;
+                         exposes /api (health) + /api/trpc/* (tRPC)
     trpc/
       app-router.ts    — tRPC router (health + ask)
       routes/
@@ -71,11 +78,15 @@ supabase/
 
 ```bash
 cd expo
-cp .env.example .env       # then fill in Supabase URL + anon key
+cp .env.example .env       # then fill in Supabase URL + anon key + Anthropic key
 bun install
-bun run start      # Expo CLI, tunneled — scan QR
+bun run start      # bunx expo start --tunnel, scan QR
 bun run start-web  # web preview
 ```
+
+The Hono + tRPC backend is served by the Expo Router API route at
+`app/api/trpc/[...trpc]+api.ts`, so there is no separate backend process:
+the same `expo start` dev server handles the app *and* `/api/trpc/*`.
 
 ### Supabase setup (one-time)
 
@@ -111,4 +122,4 @@ No demo account — sign up as a real parent via the in-app signup screen.
 
 ## Branch
 
-Development branch: `claude/loving-faraday-mVxie`
+Development branch: `claude/affectionate-johnson-VumSc`

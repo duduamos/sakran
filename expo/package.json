@@ -3,9 +3,9 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "bunx rork start -p m8hiu8c2zrny06e60n08g --tunnel",
-    "start-web": "bunx rork start -p m8hiu8c2zrny06e60n08g --web --tunnel",
-    "start-web-dev": "DEBUG=expo* bunx rork start -p m8hiu8c2zrny06e60n08g --web --tunnel",
+    "start": "bunx expo start --tunnel",
+    "start-web": "bunx expo start --web --tunnel",
+    "start-web-dev": "DEBUG=expo* bunx expo start --web --tunnel",
     "lint": "expo lint"
   },
   "dependencies": {
@@ -14,7 +14,6 @@
     "@nkzw/create-context-hook": "^1.1.0",
     "@anthropic-ai/sdk": "^0.40.0",
     "@react-native-async-storage/async-storage": "2.2.0",
-    "@rork-ai/toolkit-sdk": "^0.2.51",
     "@supabase/supabase-js": "^2.45.0",
     "@tanstack/react-query": "^5.83.0",
     "@trpc/client": "^11.10.0",

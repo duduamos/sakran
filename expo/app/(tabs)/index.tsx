@@ -26,6 +26,7 @@ export default function AskScreen() {
   const [currentAnswer, setCurrentAnswer] = useState<QuestionRecord | null>(null);
   const [isThinking, setIsThinking] = useState<boolean>(false);
   const scrollRef = useRef<ScrollView>(null);
+  const inputRef = useRef<TextInput>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   React.useEffect(() => {
@@ -62,6 +63,13 @@ export default function AskScreen() {
     } finally {
       setIsThinking(false);
     }
+  };
+
+  const handleNewQuestion = () => {
+    setCurrentAnswer(null);
+    setInput('');
+    setTimeout(() => inputRef.current?.focus(), 0);
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
   };
 
   return (
@@ -126,7 +134,7 @@ export default function AskScreen() {
             <AnswerCard record={currentAnswer} />
             <TouchableOpacity
               style={styles.askAgainButton}
-              onPress={() => setCurrentAnswer(null)}
+              onPress={handleNewQuestion}
               testID="ask-again"
             >
               <Text style={styles.askAgainText}>שאלה חדשה</Text>
@@ -145,6 +153,7 @@ export default function AskScreen() {
           <Send size={22} color={Colors.white} />
         </TouchableOpacity>
         <TextInput
+          ref={inputRef}
           style={styles.input}
           placeholder="שאל אותי שאלה..."
           placeholderTextColor={Colors.textLight}
