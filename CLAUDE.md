@@ -36,48 +36,46 @@ repo. All field-report code, types, and routes are gone.
 ## Key directories
 
 ```
-expo/
-  app/
-    _layout.tsx        — root nav gate (auth → onboarding → tabs)
-    login.tsx          — parent sign-in (email + password)
-    signup.tsx         — parent sign-up + age/terms attestation
-    onboarding.tsx     — parent creates child profile (name, age, interests)
-    (tabs)/
-      index.tsx        — child: "ask anything" screen
-      library.tsx      — past Q&A
-      parent.tsx       — parent dashboard (stats, conversation prompts)
-    api/
-      trpc/
-        [...trpc]+api.ts — Expo Router API route that hands every
-                           request under /api/trpc/* to the Hono app
-  components/
-    AnswerCard.tsx     — Q/A card with image carousel + follow-up
-  constants/
-    colors.ts          — kid-friendly purple+pink+amber palette
-    mockAnswers.ts     — Sprint-0 mock Q&A by age (5-10)
-  contexts/
-    AuthContext.tsx    — Supabase parent session (signUp/signIn/signOut)
-    KidContext.tsx     — kids list (Supabase) + history (AsyncStorage per parent)
-  lib/
-    supabase.ts        — Supabase client (AsyncStorage adapter, env-driven)
-  types/
-    kid.ts             — KidProfile, QuestionRecord, ParentUser, INTERESTS
-  backend/
-    hono.ts            — Hono app, mounted by the API route above;
-                         exposes /api (health) + /api/trpc/* (tRPC)
+app/
+  _layout.tsx        — root nav gate (auth → onboarding → tabs)
+  login.tsx          — parent sign-in (email + password)
+  signup.tsx         — parent sign-up + age/terms attestation
+  onboarding.tsx     — parent creates child profile (name, age, interests)
+  (tabs)/
+    index.tsx        — child: "ask anything" screen
+    library.tsx      — past Q&A
+    parent.tsx       — parent dashboard (stats, conversation prompts)
+  api/
     trpc/
-      app-router.ts    — tRPC router (health + ask)
-      routes/
-        answer.ts      — Claude Haiku 4.5 call with age-tuned Hebrew prompt
+      [...trpc]+api.ts — Expo Router API route that hands every
+                         request under /api/trpc/* to the Hono app
+components/
+  AnswerCard.tsx     — Q/A card with image carousel + follow-up
+constants/
+  colors.ts          — kid-friendly purple+pink+amber palette
+  mockAnswers.ts     — Sprint-0 mock Q&A by age (5-10)
+contexts/
+  AuthContext.tsx    — Supabase parent session (signUp/signIn/signOut)
+  KidContext.tsx     — kids list (Supabase) + history (AsyncStorage per parent)
+lib/
+  supabase.ts        — Supabase client (AsyncStorage adapter, env-driven)
+types/
+  kid.ts             — KidProfile, QuestionRecord, ParentUser, INTERESTS
+backend/
+  hono.ts            — Hono app, mounted by the API route above;
+                       exposes /api (health) + /api/trpc/* (tRPC)
+  trpc/
+    app-router.ts    — tRPC router (health + ask)
+    routes/
+      answer.ts      — Claude Haiku 4.5 call with age-tuned Hebrew prompt
 supabase/
   migrations/
-    0001_init.sql      — parent_profiles, kids, RLS, signup trigger
+    0001_init.sql    — parent_profiles, kids, RLS, signup trigger
 ```
 
 ## Running
 
 ```bash
-cd expo
 cp .env.example .env       # then fill in Supabase URL + anon key + Anthropic key
 bun install
 bun run start      # bunx expo start --tunnel, scan QR
@@ -93,7 +91,7 @@ the same `expo start` dev server handles the app *and* `/api/trpc/*`.
 1. Create a project at https://supabase.com (Frankfurt or London region).
 2. **Authentication → Providers**: keep Email enabled with "Confirm email" on.
 3. Open the SQL Editor and run `supabase/migrations/0001_init.sql`.
-4. Copy **Project URL** + **anon public key** into `expo/.env`.
+4. Copy **Project URL** + **anon public key** into `.env`.
 
 No demo account — sign up as a real parent via the in-app signup screen.
 
